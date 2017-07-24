@@ -13,8 +13,16 @@ test('resolveFrom()', t => {
 	t.is(moduleNotFoundError.code, 'MODULE_NOT_FOUND');
 	t.is(moduleNotFoundError.message, 'Cannot find module \'./nonexistent\'');
 
+	const fromNotFoundError = t.throws(() => {
+		m('fixture-not-exists', './fixture');
+	}, Error);
+	t.is(fromNotFoundError.code, 'ENOENT');
+	t.regex(fromNotFoundError.message, /fixture-not-exists/);
+
 	const resolveFromfixture = m.bind(null, 'fixture');
 	t.regex(resolveFromfixture('./fixture'), /fixture\/fixture\.js$/);
+
+	t.truthy(m('./fixture/fixture-for-symlinks/symlink-target', 'foo'));
 });
 
 test('resolveFrom.silent()', t => {
@@ -23,4 +31,6 @@ test('resolveFrom.silent()', t => {
 
 	const silentResolveFromfixture = m.silent.bind(null, 'fixture');
 	t.regex(silentResolveFromfixture('./fixture'), /fixture\/fixture\.js$/);
+
+	t.is(m.silent('fixture-not-exists', './fixture'), null);
 });
