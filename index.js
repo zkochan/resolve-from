@@ -15,10 +15,13 @@ const resolveFrom = (fromDir, moduleId, silent) => {
 	try {
 		fromDir = fs.realpathSync(fromDir);
 	} catch (err) {
-		if (silent) {
+		if (err.code === 'ENOENT') {
+			fromDir = path.resolve(fromDir);
+		} else if (silent) {
 			return null;
+		} else {
+			throw err;
 		}
-		throw err;
 	}
 
 	const fromFile = path.join(fromDir, 'noop.js');
